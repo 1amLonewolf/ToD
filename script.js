@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Import configuration
     const apifyConfig = window.apifyConfig || {
       levels: {
-        beginner: { name: "Beginner", color: "#00cc99" },
-        intermediate: { name: "Intermediate", color: "#ff9900" },
-        advanced: { name: "Advanced", color: "#ff3366" }
+        beginner: { name: "Beginner", color: "#00cc99", truthScraper: "iam_lonewolf/my-actor", dareScraper: "iam_lonewolf/my-actor" },
+        intermediate: { name: "Intermediate", color: "#ff9900", truthScraper: "iam_lonewolf/my-actor", dareScraper: "iam_lonewolf/my-actor" },
+        advanced: { name: "Advanced", color: "#ff3366", truthScraper: "iam_lonewolf/my-actor", dareScraper: "iam_lonewolf/my-actor" }
       }
     };
 
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const apiToken = localStorage.getItem('apifyToken') || '';
       if (apiToken) {
         apifyService = new ApifyService(apiToken);
-        console.log('Apify service initialized');
+        console.log('Apify service initialized with token');
       } else {
         console.log('No Apify token found, using local content');
       }
@@ -125,25 +125,35 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset game state
         players = ["", ""];
         currentPlayer = 0;
-        questionDisplay.textContent = "Click "Truth" or "Dare" to begin!";
+        questionDisplay.textContent = "Click \"Truth\" or \"Dare\" to begin!";
     }
     
     // Fetch content from Apify based on level
     async function fetchLevelContent(contentType) {
       if (!apifyService) {
         // Return default content if no Apify service
+        console.log('No Apify service available, using local content');
         return contentType === 'truth' ? truths : dares;
       }
       
       try {
-        // This would be implemented with actual scraper IDs
-        console.log(`Fetching ${contentType} content for level: ${currentLevel}`);
-        // Example placeholder - in real implementation:
-        // const data = await apifyService.getLastRunDataset(levelConfig.truthScraper);
-        // return data.items.map(item => item.question || item.text);
-        return contentType === 'truth' ? truths : dares;
+        const levelConfig = apifyConfig.levels[currentLevel];
+        const actorId = contentType === 'truth' ? levelConfig.truthScraper : levelConfig.dareScraper;
+        
+        if (!actorId) {
+          console.warn(`No actor ID configured for ${contentType} at level ${currentLevel}`);
+          return contentType === 'truth' ? truths : dares;
+        }
+        
+        console.log(`Fetching ${contentType} content using actor: ${actorId}`);
+        const content = await apifyService.fetchContentByLevel(actorId, currentLevel, contentType);
+        console.log(`Received ${contentType} content:`, content);
+        
+        // Return the fetched content or fallback to local content
+        return content && content.length > 0 ? content : (contentType === 'truth' ? truths : dares);
       } catch (error) {
         console.error(`Error fetching ${contentType} content:`, error);
+        // Fallback to local content
         return contentType === 'truth' ? truths : dares;
       }
     }
@@ -179,35 +189,56 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Original Event listeners
+    // Truth button event listener
     truthBtn.addEventListener('click', async function() {
         if (!players[0] || !players[1]) {
             startGame();
             return;
         }
         
-        // For now, use local content
-        // In future: const levelTruths = await fetchLevelContent('truth');
-        if (truths.length > 0) {
-            questionDisplay.textContent = getRandomItem(truths);
-        } else {
-            questionDisplay.textContent = "No truth questions available!";
+        try {
+            // Fetch level-specific truth content
+            const levelTruths = await fetchLevelContent('truth');
+            if (levelTruths.length > 0) {
+                questionDisplay.textContent = getRandomItem(levelTruths);
+            } else {
+                questionDisplay.textContent = "No truth questions available!";
+            }
+        } catch (error) {
+            console.error('Error fetching truth content:', error);
+            // Fallback to local content
+            if (truths.length > 0) {
+                questionDisplay.textContent = getRandomItem(truths);
+            } else {
+                questionDisplay.textContent = "No truth questions available!";
+            }
         }
         switchPlayer();
     });
 
+    // Dare button event listener
     dareBtn.addEventListener('click', async function() {
         if (!players[0] || !players[1]) {
             startGame();
             return;
         }
         
-        // For now, use local content
-        // In future: const levelDares = await fetchLevelContent('dare');
-        if (dares.length > 0) {
-            questionDisplay.textContent = getRandomItem(dares);
-        } else {
-            questionDisplay.textContent = "No dare challenges available!";
+        try {
+            // Fetch level-specific dare content
+            const levelDares = await fetchLevelContent('dare');
+            if (levelDares.length > 0) {
+                questionDisplay.textContent = getRandomItem(levelDares);
+            } else {
+                questionDisplay.textContent = "No dare challenges available!";
+            }
+        } catch (error) {
+            console.error('Error fetching dare content:', error);
+            // Fallback to local content
+            if (dares.length > 0) {
+                questionDisplay.textContent = getRandomItem(dares);
+            } else {
+                questionDisplay.textContent = "No dare challenges available!";
+            }
         }
         switchPlayer();
     });

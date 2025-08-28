@@ -8,22 +8,22 @@ const apifyConfig = {
     beginner: {
       name: "Beginner",
       description: "Easy questions and gentle dares",
-      truthScraper: null, // To be configured with actual scraper IDs
-      dareScraper: null,   // To be configured with actual scraper IDs
+      truthScraper: "iam_lonewolf/my-actor",
+      dareScraper: "iam_lonewolf/my-actor",
       color: "#00cc99"
     },
     intermediate: {
       name: "Intermediate", 
       description: "Moderate questions and playful dares",
-      truthScraper: null,
-      dareScraper: null,
+      truthScraper: "iam_lonewolf/my-actor",
+      dareScraper: "iam_lonewolf/my-actor",
       color: "#ff9900"
     },
     advanced: {
       name: "Advanced",
       description: "Deep questions and adventurous dares",
-      truthScraper: null,
-      dareScraper: null,
+      truthScraper: "iam_lonewolf/my-actor",
+      dareScraper: "iam_lonewolf/my-actor",
       color: "#ff3366"
     }
   },
