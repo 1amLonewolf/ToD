@@ -24,6 +24,28 @@
         <h1>Couples Truth or Dare</h1>
         <div class="subtitle">A fun game to spice up your relationship!</div>
         
+        <!-- Level Selection (Hidden by default) -->
+        <div class="level-selection" id="levelSelection" style="display: none;">
+            <h2>Select Difficulty Level</h2>
+            <div class="level-buttons">
+                <button class="level-btn" data-level="beginner" style="background-color: #00cc99;">
+                    Beginner<br><small>Easy questions and gentle dares</small>
+                </button>
+                <button class="level-btn" data-level="intermediate" style="background-color: #ff9900;">
+                    Intermediate<br><small>Moderate questions and playful dares</small>
+                </button>
+                <button class="level-btn" data-level="advanced" style="background-color: #ff3366;">
+                    Advanced<br><small>Deep questions and adventurous dares</small>
+                </button>
+            </div>
+            <div class="apify-token-input" style="margin-top: 20px; display: none;" id="apifyTokenSection">
+                <label for="apifyToken">Apify API Token (optional):</label>
+                <input type="password" id="apifyToken" placeholder="Enter your Apify token">
+                <button id="saveToken">Save Token</button>
+            </div>
+            <button id="toggleTokenInput" style="background: #4d79ff; margin-top: 10px;">Add Apify Token</button>
+        </div>
+        
         <div class="player-inputs" id="playerInputs">
             <div class="player-input">
                 <label for="player1">Player 1 Name:</label>
@@ -59,6 +81,9 @@
         </div>
     </div>
 
+    <!-- Include Apify configuration and service -->
+    <script src="apify-config.js"></script>
+    <script src="apify-service.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
